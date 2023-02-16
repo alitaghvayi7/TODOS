@@ -54,7 +54,7 @@ body {
   left: 5%;
   bottom: 10%;
   cursor: pointer;
-  font-size: 3rem;
+  font-size: 2rem;
 }
 
 .overlay {
@@ -146,9 +146,46 @@ body {
   font-weight: 500;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   border-radius: 0.5rem;
-  padding-right: 1rem;
+  padding: 0 1rem;
+}
+
+.text-task{
   cursor: pointer;
+}
+
+.task-edit-input{
+  display: none;
+  padding: 0 .6rem;
+  border-radius: .4rem;
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.task-options{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.task-options > button{
+  padding: .4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: .4rem;
+  cursor: pointer;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.edit-task{
+  background-color: rgb(250, 167, 13);
+}
+
+.delete-task{
+  background-color: #f00;
 }
 
 .task-item.completed {
