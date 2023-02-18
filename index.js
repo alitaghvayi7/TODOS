@@ -115,6 +115,7 @@ function createTaskItem(item, index) {
     textTask.classList = 'text-task';
     textTask.textContent = item.value;
     div.addEventListener('click', finishTask);
+    div.style.opacity = item.isFinished ? .5 : 1;
     div.appendChild(textTask)
 
 
@@ -134,12 +135,6 @@ function createTaskItem(item, index) {
     taskOptions.appendChild(deleteButton);
 
     div.appendChild(taskOptions);
-
-    const expiredDiv = document.createElement('div');
-    expiredDiv.className = "task-overlay";
-    expiredDiv.textContent = "انجام شده";
-    expiredDiv.style.display = item.isFinished ? "flex" : "none";
-    div.appendChild(expiredDiv);
 
     return div;
 }
@@ -191,6 +186,7 @@ function createInputBox(value) {
     input.type = "text";
     input.setAttribute('value', value);
     input.style.display = "block";
+    input.addEventListener('click', (event) => event.stopPropagation())
     return input;
 }
 
