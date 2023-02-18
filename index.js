@@ -61,7 +61,7 @@ function editTask(event) {
     currentTarget.removeEventListener("click", editTask);
     currentTarget.addEventListener('click', saveChanges.bind(null, index));
 
-    currentTarget.textContent = "save";
+    currentTarget.innerHTML = '<i class="fa-solid fa-check"></i>';
 
     //hidden the span tag that show task value
     currentTarget.parentElement.previousElementSibling.style.display = "none";
@@ -110,11 +110,11 @@ function createTaskItem(item, index) {
     const div = document.createElement('div');
     div.className = item.isFinished === true ? 'task-item completed' : 'task-item';
     div.setAttribute('data-index', index);
+    div.addEventListener('click', finishTask);
 
     const textTask = document.createElement('span');
     textTask.classList = 'text-task';
     textTask.textContent = item.value;
-    textTask.addEventListener('click', finishTask);
     div.appendChild(textTask)
 
 
@@ -160,7 +160,7 @@ function saveChanges(index, event) {
 
     currentTarget.removeEventListener('click', saveChanges);
     currentTarget.addEventListener('click', editTask);
-    currentTarget.textContent = "e";
+    // currentTarget.textContent = "e";
 
     //get the input
     const input = event.currentTarget.parentElement.previousElementSibling.previousElementSibling;
