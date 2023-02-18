@@ -50,7 +50,6 @@ function addTask(event) {
 }
 
 function editTask(event) {
-
     event.stopPropagation();
 
     const { currentTarget } = event;
@@ -79,9 +78,10 @@ function deleteTask(event) {
 
 function finishTask(event) {
 
-    const taskIndex = tasks.findIndex((task) => {
-        return task.value === event.currentTarget.textContent;
+    const taskIndex = tasks.findIndex((task, index) => {
+        return index == event.currentTarget.getAttribute('data-index');
     });
+
 
     if (tasks[taskIndex].isFinished) return;
 
@@ -108,13 +108,13 @@ function searchBetweenTasks(event) {
 
 function createTaskItem(item, index) {
     const div = document.createElement('div');
-    div.className = item.isFinished === true ? 'task-item completed' : 'task-item';
+    div.className = 'task-item';
     div.setAttribute('data-index', index);
-    div.addEventListener('click', finishTask);
 
     const textTask = document.createElement('span');
     textTask.classList = 'text-task';
     textTask.textContent = item.value;
+    div.addEventListener('click', finishTask);
     div.appendChild(textTask)
 
 
@@ -133,7 +133,13 @@ function createTaskItem(item, index) {
     deleteButton.addEventListener('click', deleteTask);
     taskOptions.appendChild(deleteButton);
 
-    div.appendChild(taskOptions)
+    div.appendChild(taskOptions);
+
+    const expiredDiv = document.createElement('div');
+    expiredDiv.className = "task-overlay";
+    expiredDiv.textContent = "انجام شده";
+    expiredDiv.style.display = item.isFinished ? "flex" : "none";
+    div.appendChild(expiredDiv);
 
     return div;
 }
@@ -156,11 +162,12 @@ function renderTasks(array) {
 
 function saveChanges(index, event) {
 
+    event.stopPropagation();
+
     const { currentTarget } = event;
 
     currentTarget.removeEventListener('click', saveChanges);
     currentTarget.addEventListener('click', editTask);
-    // currentTarget.textContent = "e";
 
     //get the input
     const input = event.currentTarget.parentElement.previousElementSibling.previousElementSibling;

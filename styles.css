@@ -68,7 +68,7 @@ body {
   align-items: center;
   justify-content: center;
   display: flex;
-  z-index: 1;
+  z-index: 2;
 }
 
 .form {
@@ -149,42 +149,56 @@ body {
   justify-content: space-between;
   border-radius: 0.5rem;
   padding: 0 1rem;
-}
-
-.text-task{
+  position: relative;
+  overflow: hidden;
   cursor: pointer;
 }
 
-.task-edit-input{
+.task-overlay {
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
   display: none;
-  padding: 0 .6rem;
-  border-radius: .4rem;
+  align-items: center;
+  padding: 0 1rem;
+  justify-content: center;
+  border-radius: 0.5rem;
+  z-index: 1;
+}
+
+.task-edit-input {
+  display: none;
+  padding: 0 0.6rem;
+  border-radius: 0.4rem;
   color: rgba(0, 0, 0, 0.8);
 }
 
-.task-options{
+.task-options {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
 }
 
-.task-options > button{
-  padding: .4rem;
+.task-options > button {
+  padding: 0.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: .4rem;
+  border-radius: 0.4rem;
   cursor: pointer;
   color: #fff;
   font-size: 1rem;
 }
 
-.edit-task{
+.edit-task {
   background-color: rgb(250, 167, 13);
 }
 
-.delete-task{
+.delete-task {
   background-color: #f00;
 }
 
@@ -193,13 +207,13 @@ body {
 }
 
 @media (width<=1020px) {
-  .tasks-container{
+  .tasks-container {
     width: 75%;
   }
-  .search-container{
+  .search-container {
     width: 75%;
   }
-  .form{
+  .form {
     width: 85%;
   }
 }
