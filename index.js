@@ -3,20 +3,37 @@ const cancelButton = document.querySelector('.cancel-button');
 const form = document.querySelector('.form');
 const tasksContainer = document.querySelector('.tasks-container');
 const searchInput = document.querySelector('.search-input');
+const searchContainer = document.querySelector('.search-container');
+const magnifying = document.querySelector('.fa-magnifying-glass');
+const micButton = document.querySelector('.mic-button');
+const micIcon = document.querySelector('.mic-button > i');
+const todoInput = document.querySelector('.todo-input');
 
 let tasks;
+
+//speech api
+const synth = window.speechSynthesis;
+const utterThis = new SpeechSynthesisUtterance();
+
+const SpeechRecognition = webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.continuous = false;
+recognition.lang = 'fa-IR';
+recognition.interimResults = false;
+recognition.maxAlternatives = 1;
 
 // form Animation
 const timeLine = gsap.timeline({
     paused: true,
     defaults: {
         ease: "power4.Out",
+        duration: .4
     }
 });
 
 timeLine
     .to('.overlay', { y: 0 })
-    .to('.form', { 'clip-path': 'polygon(100% 0, 0 0, 0 100%, 100% 100%)', duration: 1, })
+    .to('.form', { 'clip-path': 'polygon(100% 0, 0 0, 0 100%, 100% 100%)' })
     .from('.todo-input', { opacity: 0, y: -100 })
     .from('.cancel-button', { opacity: 0, x: 100 })
     .from('.save-button', { opacity: 0, x: -100 });
@@ -29,15 +46,50 @@ toggleButton.addEventListener('click', showOverlay);
 cancelButton.addEventListener('click', hiddenOverlay);
 form.addEventListener('submit', addTask);
 searchInput.addEventListener('input', searchBetweenTasks);
+micButton.addEventListener('click', recordAudio);
+
+recognition.addEventListener('result', (event) => {
+    const value = event.results[0][0].transcript;
+    todoInput.value = value;
+    endRecord();
+});
+
+recognition.addEventListener('nomatch',endRecord);
+recognition.addEventListener('error',endRecord)
+
+searchInput.addEventListener('focus', (e) => {
+    e.currentTarget.parentElement.style.width = "90%";
+});
+
+searchInput.addEventListener('blur', (e) => {
+    if (window.innerWidth <= 1020) {
+        e.currentTarget.parentElement.style.width = "55%";
+        return;
+    }
+    e.currentTarget.parentElement.style.width = "15%";
+})
 
 function init() {
     tasks = getTasksFromLocalStorage() || [];
     renderTasks(tasks);
 }
 
+function endRecord(){
+    micButton.classList.remove('active');
+    micIcon.classList = 'fa-solid fa-microphone';
+    micButton.disabled = false
+}
+
+function recordAudio(event) {
+    event.currentTarget.disabled = true;
+    todoInput.value = "";
+    micIcon.className = "fa-solid fa-microphone-lines";
+    event.currentTarget.classList.add('active');
+    recognition.start();
+}
+
 function addTask(event) {
     event.preventDefault();
-    const todoInput = document.querySelector('.todo-input');
 
     if (!todoInput.value) return;
 
@@ -76,12 +128,12 @@ function deleteTask(event) {
     renderTasksAndSaveToLocalStorage(tasks)
 }
 
+
 function finishTask(event) {
 
     const taskIndex = tasks.findIndex((task, index) => {
         return index == event.currentTarget.getAttribute('data-index');
     });
-
 
     if (tasks[taskIndex].isFinished) return;
 
@@ -109,21 +161,29 @@ function searchBetweenTasks(event) {
 function createTaskItem(item, index) {
     const div = document.createElement('div');
     div.className = 'task-item';
+    div.style.opacity = item.isFinished ? .5 : 1;
+    div.style.background = item.isFinished && '#6fa5dd';
     div.setAttribute('data-index', index);
+
+    const checkbutton = document.createElement('input')
+    checkbutton.setAttribute('type', 'checkbox')
+    div.appendChild(checkbutton)
+
+    checkbutton.addEventListener('click', finishTask)
 
     const textTask = document.createElement('span');
     textTask.classList = 'text-task';
     textTask.textContent = item.value;
+    textTask.style.textDecoration = item.isFinished && 'line-through';
     div.addEventListener('click', finishTask);
-    div.style.opacity = item.isFinished ? .5 : 1;
     div.appendChild(textTask)
-
 
     const taskOptions = document.createElement('div');
     taskOptions.className = "task-options";
 
     const editButton = document.createElement('button');
     editButton.className = "edit-task";
+    editButton.style.display = item.isFinished && 'none';
     editButton.addEventListener('click', editTask);
     editButton.innerHTML = '<i class="fa-regular fa-pen-to-square"></i>';
     taskOptions.appendChild(editButton);
@@ -133,6 +193,12 @@ function createTaskItem(item, index) {
     deleteButton.innerHTML = '<i class="fa-regular fa-trash-can"></i>'
     deleteButton.addEventListener('click', deleteTask);
     taskOptions.appendChild(deleteButton);
+
+    const speechButton = document.createElement('button');
+    speechButton.className = "speech-task";
+    speechButton.innerHTML = '<i class="fa-solid fa-volume-high"></i>'
+    speechButton.addEventListener('click', playTaskTitle);
+    taskOptions.appendChild(speechButton);
 
     div.appendChild(taskOptions);
 
@@ -165,7 +231,7 @@ function saveChanges(index, event) {
     currentTarget.addEventListener('click', editTask);
 
     //get the input
-    const input = event.currentTarget.parentElement.previousElementSibling.previousElementSibling;
+    const input = event.currentTarget.parentElement.parentElement.querySelector('.task-edit-input');
     //get the span
     const span = event.currentTarget.parentElement.previousElementSibling;
 
@@ -188,6 +254,15 @@ function createInputBox(value) {
     input.style.display = "block";
     input.addEventListener('click', (event) => event.stopPropagation())
     return input;
+}
+
+function playTaskTitle(event) {
+    event.stopPropagation();
+    event.currentTarget.disabled = true;
+    const text = event.currentTarget.parentElement.previousElementSibling.textContent;
+    utterThis.text = text;
+    synth.speak(utterThis);
+    event.currentTarget.disabled = false;
 }
 
 function showOverlay(e) {
